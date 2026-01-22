@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAD Quiz Master - Online Quiz App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== SPLASH PAGE ===== */
+        .splash-container {
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s infinite;
+            font-size: 60px;
+        }
+
+        .splash-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .splash-tagline {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .splash-loader {
+            width: 50px;
+            height: 50px;
+            margin: 30px auto;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .splash-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 50px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            background: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== QUIZ PAGE ===== */
+        .quiz-container {
+            animation: slideInUp 0.5s ease;
+        }
+
+        .quiz-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .quiz-counter {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            animation: slideInUp 0.5s ease;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+        }
+
+        .option-btn:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .quiz-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-next {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background: #f5f5f5;
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== RESULT PAGE ===== */
+        .result-container {
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin: 30px 0;
+            animation: slideInUp 0.6s ease;
+        }
+
+        .medal-icon {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 1s ease;
+        }
+
+        .rank-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .percentage {
+            font-size: 1.3rem;
+            color: #666;
+            margin: 10px 0 20px;
+        }
+
+        .compliment {
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: 600;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        .result-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        /* ===== ADD QUIZ PAGE ===== */
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: slideInUp 0.5s ease;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideInDown 0.4s ease;
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .splash-title {
+                font-size: 2rem;
+            }
+
+            .splash-tagline {
+                font-size: 1rem;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .option-btn {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+
+            .result-card {
+                padding: 25px;
+            }
+
+            .score-display {
+                font-size: 2.5rem;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .form-title {
+                font-size: 1.4rem;
+            }
+
+            .quiz-footer {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .splash-logo {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+
+            .splash-title {
+                font-size: 1.6rem;
+            }
+
+            .splash-buttons {
+                margin-top: 30px;
+            }
+
+            .question-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .question-text {
+                font-size: 1rem;
+            }
+
+            .option-btn {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .score-display {
+                font-size: 2rem;
+            }
+
+            .medal-icon {
+                font-size: 3rem;
+            }
+        }
+
+        /* ===== HIDDEN PAGES ===== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLASH PAGE -->
+    <div id="splashPage" class="container">
+        <div class="splash-container">
+            <div class="splash-logo">🎯</div>
+            <h1 class="splash-title">MAD Quiz Master</h1>
+            <p class="splash-tagline">Test Your MAD Knowledge</p>
+            <div class="splash-loader"></div>
+            <p style="font-size: 0.9rem; opacity: 0.8;">Loading...</p>
+        </div>
+    </div>
+
+    <!-- QUIZ PAGE -->
+    <div id="quizPage" class="container hidden">
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-counter">
+                    Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div class="options-container" id="optionsContainer"></div>
+            </div>
+
+            <div class="quiz-footer">
+                <button class="btn-next" id="nextBtn" disabled>Next Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT PAGE -->
+    <div id="resultPage" class="container hidden">
+        <div class="result-container">
+            <h2 style="font-size: 1.8rem; margin-bottom: 10px;">Quiz Completed! 🎉</h2>
+
+            <div class="result-card">
+                <div class="medal-icon" id="medalIcon">🥇</div>
+                <div class="rank-title" id="rankTitle">Excellent Scorer</div>
+                <div class="score-display">
+                    <span id="scoreValue">0</span> / <span id="maxScore">10</span>
+                </div>
+                <div class="percentage" id="percentageValue">0%</div>
+                <div class="compliment" id="compliment">Excellent performance!</div>
+            </div>
+
+            <div class="result-buttons">
+                <button class="btn btn-primary" onclick="startQuiz()">Play Again</button>
+                <button class="btn btn-secondary" onclick="goToAddQuiz()">Add Questions</button>
+                <button class="btn btn-secondary" onclick="goToHome()">Go Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD QUIZ PAGE -->
+    <div id="addQuizPage" class="container hidden">
+        <div class="form-container">
+            <h2 class="form-title">📝 Create Your Question</h2>
+            <div id="successMessage" class="success-message hidden">
+                ✓ Question added successfully!
+            </div>
+
+            <form id="quizForm">
+                <div class="form-group">
+                    <label class="form-label">Question *</label>
+                    <textarea class="form-input form-textarea" id="question" placeholder="Enter your question" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Option A *</label>
+                    <input type="text" class="form-input" id="optionA" placeholder="Enter option A" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Option B *</label>
+                    <input type="text" class="form-input" id="optionB" placeholder="Enter option B" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Option C *</label>
+                    <input type="text" class="form-input" id="optionC" placeholder="Enter option C" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Option D *</label>
+                    <input type="text" class="form-input" id="optionD" placeholder="Enter option D" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correct Answer *</label>
+                    <select class="form-select" id="correctAnswer" required>
+                        <option value="">Select correct answer</option>
+                        <option value="0">Option A</option>
+                        <option value="1">Option B</option>
+                        <option value="2">Option C</option>
+                        <option value="3">Option D</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-save">Save Question</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="#" onclick="goToHome(); return false;" class="home-link">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DEFAULT MAD QUESTIONS =====
+        const defaultQuestions = [
+            {
+                question: "What does MAD stand for in development?",
+                options: ["Mobile App Development", "Multi-Android Device", "Mobile Advancement Device", "Modern Application Design"],
+                correct: 0
+            },
+            {
+                question: "Which of these is NOT an Android lifecycle state?",
+                options: ["onCreate()", "onStart()", "onDestroy()", "onDisplay()"],
+                correct: 3
+            },
+            {
+                question: "What is the primary purpose of an Activity in Android?",
+                options: ["Database management", "Providing UI screen to user", "Network communication", "File storage"],
+                correct: 1
+            },
+            {
+                question: "Which layout is best for responsive designs in Android?",
+                options: ["LinearLayout", "FrameLayout", "ConstraintLayout", "TableLayout"],
+                correct: 2
+            },
+            {
+                question: "What is an Intent in Android?",
+                options: ["A way to store user data", "A message object for requesting action from components", "A database query", "A UI widget"],
+                correct: 1
+            },
+            {
+                question: "Which API level is considered the base for modern Android development?",
+                options: ["API 16", "API 21", "API 26", "API 30"],
+                correct: 2
+            },
+            {
+                question: "What language is primarily used for Android development?",
+                options: ["Python", "C++", "Java/Kotlin", "JavaScript"],
+                correct: 2
+            },
+            {
+                question: "What is a Fragment in Android?",
+                options: ["A broken Activity", "A reusable piece of UI within an Activity", "A type of Service", "A database table"],
+                correct: 1
+            },
+            {
+                question: "Which data storage method is used for small amounts of data in Android?",
+                options: ["SQLite", "File System", "SharedPreferences", "Cloud Storage"],
+                correct: 2
+            },
+            {
+                question: "What does Android Studio use as its default version control?",
+                options: ["SVN", "Git", "Mercurial", "Perforce"],
+                correct: 1
+            }
+        ];
+
+        // ===== GLOBAL VARIABLES =====
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizQuestions = [];
+
+        // ===== INITIALIZE APP =====
+        window.addEventListener('DOMContentLoaded', () => {
+            loadQuestions();
+            setTimeout(() => {
+                document.getElementById('splashPage').classList.add('hidden');
+                // User needs to click Start Quiz button
+            }, 2000);
+
+            // Setup form submission
+            document.getElementById('quizForm').addEventListener('submit', saveQuestion);
+        });
+
+        // ===== LOAD QUESTIONS =====
+        function loadQuestions() {
+            const stored = localStorage.getItem('customQuestions');
+            const customQuestions = stored ? JSON.parse(stored) : [];
+            quizQuestions = [...defaultQuestions, ...customQuestions];
+        }
+
+        // ===== SPLASH PAGE - START QUIZ =====
+        function startQuiz() {
+            loadQuestions();
+            currentQuestionIndex = 0;
+            userAnswers = new Array(Math.min(quizQuestions.length, 10)).fill(null);
+            
+            document.getElementById('splashPage').classList.add('hidden');
+            document.getElementById('quizPage').classList.remove('hidden');
+            document.getElementById('resultPage').classList.add('hidden');
+            
+            displayQuestion();
+        }
+
+        // ===== DISPLAY QUESTION =====
+        function displayQuestion() {
+            const questions = quizQuestions.slice(0, 10);
+            const question = questions[currentQuestionIndex];
+
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = questions.length;
+            document.getElementById('questionText').textContent = question.question;
+
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+
+            // Render options
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+
+                if (userAnswers[currentQuestionIndex] === index) {
+                    btn.classList.add('selected');
+                }
+
+                btn.addEventListener('click', () => selectAnswer(index, btn));
+                container.appendChild(btn);
+            });
+
+            // Update Next button
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestionIndex < questions.length - 1) {
+                nextBtn.textContent = 'Next Question';
+                nextBtn.disabled = userAnswers[currentQuestionIndex] === null;
+            } else {
+                nextBtn.textContent = 'Submit Quiz';
+                nextBtn.disabled = userAnswers[currentQuestionIndex] === null;
+            }
+        }
+
+        // ===== SELECT ANSWER =====
+        function selectAnswer(index, button) {
+            // Remove selected from all buttons
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Add selected to clicked button
+            button.classList.add('selected');
+            userAnswers[currentQuestionIndex] = index;
+
+            // Enable Next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // ===== NEXT QUESTION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    const questions = quizQuestions.slice(0, 10);
+                    if (currentQuestionIndex < questions.length - 1) {
+                        currentQuestionIndex++;
+                        displayQuestion();
+                    } else {
+                        submitQuiz();
+                    }
+                });
+            }
+        });
+
+        // ===== SUBMIT QUIZ =====
+        function submitQuiz() {
+            const questions = quizQuestions.slice(0, 10);
+            let score = 0;
+
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    score++;
+                }
+            });
+
+            showResults(score, questions.length);
+        }
+
+        // ===== SHOW RESULTS =====
+        function showResults(score, total) {
+            const percentage = Math.round((score / total) * 100);
+
+            // Determine medal and rank
+            let medal, rank, compliment;
+
+            if (score >= 9) {
+                medal = '🥇';
+                rank = 'Excellent Scorer - Gold Medal';
+                compliment = 'Outstanding performance! You are a MAD expert! 🌟';
+            } else if (score >= 7) {
+                medal = '🥈';
+                rank = 'Very Good - Silver Medal';
+                compliment = 'Great job! Keep learning and practice more! 💪';
+            } else if (score >= 5) {
+                medal = '🥉';
+                rank = 'Good Attempt - Bronze Medal';
+                compliment = 'Good effort! Review concepts and try again! 📚';
+            } else {
+                medal = '📚';
+                rank = 'Try More';
+                compliment = 'Best is Yet To Come! Keep practicing! 🚀';
+            }
+
+            // Update result page
+            document.getElementById('medalIcon').textContent = medal;
+            document.getElementById('rankTitle').textContent = rank;
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('maxScore').textContent = total;
+            document.getElementById('percentageValue').textContent = percentage + '%';
+            document.getElementById('compliment').textContent = compliment;
+
+            // Show result page
+            document.getElementById('quizPage').classList.add('hidden');
+            document.getElementById('resultPage').classList.remove('hidden');
+        }
+
+        // ===== GO TO ADD QUIZ PAGE =====
+        function goToAddQuiz() {
+            document.getElementById('resultPage').classList.add('hidden');
+            document.getElementById('quizPage').classList.add('hidden');
+            document.getElementById('splashPage').classList.add('hidden');
+            document.getElementById('addQuizPage').classList.remove('hidden');
+
+            // Reset form
+            document.getElementById('quizForm').reset();
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+
+        // ===== GO TO HOME =====
+        function goToHome() {
+            location.reload();
+        }
+
+        // ===== SAVE CUSTOM QUESTION =====
+        function saveQuestion(e) {
+            e.preventDefault();
+
+            const question = document.getElementById('question').value;
+            const options = [
+                document.getElementById('optionA').value,
+                document.getElementById('optionB').value,
+                document.getElementById('optionC').value,
+                document.getElementById('optionD').value
+            ];
+            const correct = parseInt(document.getElementById('correctAnswer').value);
+
+            // Save to localStorage
+            const stored = localStorage.getItem('customQuestions');
+            const customQuestions = stored ? JSON.parse(stored) : [];
+
+            customQuestions.push({
+                question: question,
+                options: options,
+                correct: correct
+            });
+
+            localStorage.setItem('customQuestions', JSON.stringify(customQuestions));
+
+            // Show success message
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('quizForm').reset();
+
+            // Hide message after 2 seconds
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.add('hidden');
+            }, 2000);
+        }
+
+        // ===== FROM SPLASH PAGE =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create start button dynamically
+            const splashContainer = document.querySelector('.splash-container');
+            if (splashContainer) {
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'splash-buttons';
+                buttonsDiv.innerHTML = `
+                    <button class="btn btn-primary" onclick="startQuiz()">Start Quiz 🚀</button>
+                    <button class="btn btn-secondary" onclick="goToAddQuiz()">Add Questions ✏️</button>
+                `;
+                splashContainer.appendChild(buttonsDiv);
+            }
+        });
+    </script>
+</body>
+</html>
